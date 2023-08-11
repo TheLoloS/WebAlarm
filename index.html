@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>budzik</title>
+    <style>
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+        filter: invert(1);
+        background: #000;
+        color: #666;
+        overflow: hidden;
+      }
+
+      .fullscreen-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      .fullscreen-content {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .fullscreen-overlay.show {
+        display: flex;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="fullscreenButton" style="margin-bottom: 1rem; padding: 8px">
+      Pełny Ekran
+    </button>
+    <div class="fullscreen-overlay" id="fullscreenOverlay">
+      <div class="fullscreen-content">
+        <button
+          id="alarmSetButtonFullscreen"
+          style="margin-bottom: 1rem; padding: 8px"
+        >
+          Ustaw Alarmy
+        </button>
+        <button id="alarmStopButtonFullscreen" style="padding: 8px">
+          Wyłącz/Usuń 1 Alarm
+        </button>
+      </div>
+    </div>
+    <h1>Alarm</h1>
+    <input type="time" id="alarmTime" />
+    <br />
+    <div style="display: inline-flex">
+      <button id="alarmSetButton" style="margin-right: 1rem; padding: 8px">
+        Ustaw Alarm
+      </button>
+      <button id="alarmStopButton" style="padding: 8px">
+        Wyłacz/usuń 1 Alarm
+      </button>
+    </div>
+    <h1 id="clock">00:00:00 AM</h1>
+    <h2 style="padding: 0; margin: 0; margin-bottom: 1rem">
+      Alarm ustawiony na:
+    </h2>
+    <h2 id="alarmTimeValue" style="margin: 0"></h2>
+    <br />
+
+    <p><i>Created by: </i><b style="font-size: larger">TheLoloS</b><i>™</i></p>
+    <script>
+      var alarm = new Audio("alarm.mp3");
+      var alarmSet = false;
+      var alarmTime = document.getElementById("alarmTime");
+      var alarmSetButton = document.getElementById("alarmSetButton");
+      var alarmStopButton = document.getElementById("alarmStopButton");
+      var alarmTimeValue = [];
+      setInterval(function () {
+        var time = new Date();
+        var hours = time.getHours();
+        var minutes = time.getMinutes();
+        var seconds = time.getSeconds();
+        var am_pm = "AM";
+        // if (hours > 12) {
+        //   hours -= 12;
+        //   am_pm = "PM";
+        // }
+        if (hours < 10) {
+          hours = "0" + hours;
+        }
+        if (minutes < 10) {
+          minutes = "0" + minutes;
+        }
+        if (seconds < 10) {
+          seconds = "0" + seconds;
+        }
+        document.getElementById("clock").innerHTML =
+          hours + ":" + minutes + ":" + seconds + " " + am_pm;
+        if (alarmSet == true) {
+          alarmTimeValue.map((alarmTimeValue) => {
+            if (alarmTimeValue == hours + ":" + minutes) {
+              alarm.is;
+              alarm.play();
+            }
+          });
+        }
+        if (alarmSet == false) {
+          alarm.pause();
+          alarm.currentTime = 0;
+        }
+      }, 1000);
+      alarmSetButton.addEventListener("click", function () {
+        alarmSet = true;
+        alarmTimeValue.push(alarmTime.value);
+        const elements = alarmTimeValue.map((x, i) => {
+          return `<li>${x}</li>`;
+        });
+        document.getElementById(
+          "alarmTimeValue"
+        ).innerHTML = `<ul>${elements.join("")}</ul>`;
+        if (alarmTimeValue.length == 0) {
+          alarmSet = false;
+        }
+      });
+      alarmStopButton.addEventListener("click", function () {
+        const a = alarmTimeValue.slice(1);
+        alarmTimeValue = a;
+        const elements = alarmTimeValue.map((x) => {
+          return `<li>${x}</li>`;
+        });
+        document.getElementById(
+          "alarmTimeValue"
+        ).innerHTML = `<ul>${elements.join("")}</ul>`;
+
+        if (alarmTimeValue.length == 0) {
+          alarmSet = false;
+        }
+        alarm.pause();
+        alarm.currentTime = 0;
+      });
+      // Zmienione identyfikatory przycisków na nowe dla overlaya
+      const alarmSetButtonFullscreen = document.getElementById(
+        "alarmSetButtonFullscreen"
+      );
+      const alarmStopButtonFullscreen = document.getElementById(
+        "alarmStopButtonFullscreen"
+      );
+
+      alarmSetButtonFullscreen.addEventListener("click", showFullscreenOverlay);
+      alarmStopButtonFullscreen.addEventListener(
+        "click",
+        hideFullscreenOverlay
+      );
+
+      function showFullscreenOverlay() {
+        fullscreenOverlay.classList.add("show");
+      }
+
+      function hideFullscreenOverlay() {
+        fullscreenOverlay.classList.remove("show");
+      }
+      const fullscreenButton = document.getElementById("fullscreenButton");
+
+      fullscreenButton.addEventListener("click", function () {
+        const body = document.body;
+
+        if (body.requestFullscreen) {
+          body.requestFullscreen();
+        } else if (body.mozRequestFullScreen) {
+          // Firefox
+          body.mozRequestFullScreen();
+        } else if (body.webkitRequestFullscreen) {
+          // Chrome, Safari, Edge
+          body.webkitRequestFullscreen();
+        } else if (body.msRequestFullscreen) {
+          // IE/Edge
+          body.msRequestFullscreen();
+        }
+      });
+      document.addEventListener("fullscreenchange", exitFullscreenHandler);
+      document.addEventListener("mozfullscreenchange", exitFullscreenHandler);
+      document.addEventListener(
+        "webkitfullscreenchange",
+        exitFullscreenHandler
+      );
+      document.addEventListener("msfullscreenchange", exitFullscreenHandler);
+
+      function exitFullscreenHandler() {
+        if (
+          !document.fullscreenElement &&
+          !document.mozFullScreenElement &&
+          !document.webkitFullscreenElement &&
+          !document.msFullscreenElement
+        ) {
+          // Wyjście z trybu pełnoekranowego
+        }
+      }
+    </script>
+  </body>
+</html>
